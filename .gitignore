@@ -1,0 +1,11 @@
+*.exe
+*.out
+app
+LabEstru
+*.bin
+*.dat
+*.idx
+.vscode/
+.idea/
+build/
+cmake-build-debug/
