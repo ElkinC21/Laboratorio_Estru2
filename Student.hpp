@@ -9,7 +9,7 @@ struct Student {
     int age;
     char enrollment_date[8];
     std::string name;
-    bool active;
+    bool is_active;
     
 };
 
