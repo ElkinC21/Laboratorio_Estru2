@@ -4,23 +4,23 @@
 #include <vector>
 #include <string>
 
-// Structure that represents a single row in our index table
+
 struct IndexEntry {
-    char account_number[11]; // Primary key (10 digits + '\0')
-    long long offset;        // Exact byte position in the .dat file
-    int record_size;         // Total size of the record in bytes
+    char account_number[10]; 
+    long long offset;        
+    int record_size;        
 };
 
 class Index {
 private:
-    std::vector<IndexEntry> entries; // RAM container for sorted index entries
-    std::string index_path;          // Physical path of the index file (e.g., "students.idx")
+    std::vector<IndexEntry> entries; 
+    std::string index_path;          
 
 public:
-    // Constructor
+    Index();
     Index(const std::string& path);
-
-    // Core database operations
+ 
+    
     bool load();
     bool save();
     bool insert(const std::string& account, long long offset, int size);
@@ -28,7 +28,7 @@ public:
     void removeFromMemory(int position);
     void clear();
     
-    // Getters / Helper methods
+    
     IndexEntry getEntry(int position) const;
     size_t size() const;
 };
