@@ -31,9 +31,9 @@ Student FileManager::readJson(const std::string& json_path) {
     json j;
     try {
         file >> j;
-        std::string account = j["No_Cuenta"];
-        std::string phone = j["Telefono"];
-        std::string enrollment = j["Fecha_Ingreso"];
+        std::string account = j["account_id"];
+        std::string phone = j["phone_number"];
+        std::string enrollment = j["enrollment_date"];
 
         std::strncpy(student.account_id, account.c_str(), sizeof(student.account_id) - 1);
         student.account_id[sizeof(student.account_id) - 1] = '\0';
@@ -44,8 +44,8 @@ Student FileManager::readJson(const std::string& json_path) {
         std::strncpy(student.enrollment_date, enrollment.c_str(), sizeof(student.enrollment_date) - 1);
         student.enrollment_date[sizeof(student.enrollment_date) - 1] = '\0';
         
-        student.age = j["Edad"];
-        student.name = j["Nombre"];
+        student.age = j["age"];
+        student.name = j["name"];
     } catch(const std::exception& e) {
         std::cerr << "Error parsing JSON: " << e.what() << "\n";
         student.is_active = false;

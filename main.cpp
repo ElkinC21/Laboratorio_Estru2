@@ -25,7 +25,7 @@ int main(int argc, const char* argv[]) {
         manager.updateStudent(cli.getArgument());
     } 
     else if (cli.getCommand() == CliCommand::CleanUp) {
-        manager.cleanUp();
+        manager.cleanUp(); 
     }
 
     return 0;
