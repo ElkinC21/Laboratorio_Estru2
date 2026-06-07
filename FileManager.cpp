@@ -148,30 +148,56 @@ bool FileManager::deleteStudent(const std::string& account_id) {
 
 bool FileManager::updateStudent(const std::string& json_path) {
     Student s = this->readJson(json_path);
-    int pos = this->index.search(s.account_id);
-    if (pos == -1) return false;
+    if (s.is_active == false) return false;
 
-    this->deleteStudent(s.account_id); 
+    int pos = this->index.search(s.account_id);
+    if (pos == -1) {
+        std::cerr << "Student does not exist. Cannot update.\n";
+        return false;
+    }
+
+    
+    IndexEntry old_entry = this->index.getEntry(pos);
+    std::fstream file(this->data_file, std::ios::binary | std::ios::in | std::ios::out);
+    
+    
+    long is_active_offset = old_entry.offset + sizeof(Student::account_id) + 
+                            sizeof(Student::phone_number) + sizeof(Student::age) + 
+                            sizeof(Student::enrollment_date);
+    
+    file.seekp(is_active_offset, std::ios::beg);
+    bool inactive = false;
+    file.write(reinterpret_cast<char*>(&inactive), sizeof(inactive));
+    file.close();
+
+    
     this->index.removeFromMemory(pos);
 
-    std::ofstream file(this->data_file, std::ios::binary | std::ios::app);
-    long long new_offset = file.tellp();
-
-    file.write(s.account_id, sizeof(s.account_id));
-    file.write(s.phone_number, sizeof(s.phone_number));
-    file.write(reinterpret_cast<char*>(&s.age), sizeof(s.age));
-    file.write(s.enrollment_date, sizeof(s.enrollment_date));
-    bool active = true;
-    file.write(reinterpret_cast<char*>(&active), sizeof(active));
-    int name_len = s.name.length();
-    file.write(reinterpret_cast<char*>(&name_len), sizeof(name_len));
-    file.write(s.name.c_str(), name_len);
     
-    file.close();
-    this->index.insert(s.account_id, new_offset, sizeof(s.account_id) + sizeof(s.phone_number) + sizeof(s.age) + sizeof(s.enrollment_date) + sizeof(active) + sizeof(name_len) + name_len);
+    std::ofstream out_file(this->data_file, std::ios::binary | std::ios::app);
+    out_file.seekp(0, std::ios::end);
+    long long new_offset = out_file.tellp();
+
+    out_file.write(s.account_id, sizeof(s.account_id));
+    out_file.write(s.phone_number, sizeof(s.phone_number));
+    out_file.write(reinterpret_cast<char*>(&s.age), sizeof(s.age));
+    out_file.write(s.enrollment_date, sizeof(s.enrollment_date));
+    out_file.write(reinterpret_cast<char*>(&s.is_active), sizeof(s.is_active));
+    
+    int name_len = s.name.length();
+    out_file.write(reinterpret_cast<char*>(&name_len), sizeof(name_len));
+    out_file.write(s.name.c_str(), name_len);
+    
+    int total_size = sizeof(s.account_id) + sizeof(s.phone_number) + sizeof(s.age) + 
+                     sizeof(s.enrollment_date) + sizeof(s.is_active) + sizeof(name_len) + name_len;
+    out_file.close();
+
+    
+    this->index.insert(s.account_id, new_offset, total_size);
+
+    std::cout << "Student updated successfully.\n";
     return true;
 }
-
 bool FileManager::cleanUp() {
     std::ifstream file_in(this->data_file, std::ios::binary);
     std::ofstream file_out("temp_students.dat", std::ios::binary);
