@@ -239,5 +239,7 @@ bool FileManager::cleanUp() {
     std::remove(this->data_file.c_str());
     std::rename("temp_students.dat", this->data_file.c_str());
     this->index = new_index;
+    std::cout << "Clean-up completed successfully.\n";
     return true;
+    
 }
