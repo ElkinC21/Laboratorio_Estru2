@@ -6,7 +6,7 @@
 
 
 struct IndexEntry {
-    char account_number[11]; 
+    char account_number[10]; 
     long long offset;        
     int record_size;        
 };
